@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 actix-web = "4.0"
+
+[dependencies.uuid]
+version = "1.16.0"
+features = ["v4"]
