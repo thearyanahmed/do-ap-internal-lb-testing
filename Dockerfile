@@ -1,11 +1,5 @@
 FROM rustlang/rust:nightly-slim
 
-RUN apt-get update && apt-get install -y \
-    iputils-ping \
-    procps \
-    top \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 ENV RUST_LOG=info
