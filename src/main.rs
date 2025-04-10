@@ -13,11 +13,14 @@ async fn handle_request(data: web::Data<AppState>) -> impl Responder {
     let mut count = data.request_count.lock().unwrap();
     *count += 1;
 
+    log::info!("[{}] server has handled {} requests.", instance_uuid, count);
     format!("[{}] server has handled {} requests.", instance_uuid, count)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
+
     let id = Uuid::new_v4();
 
     let data = web::Data::new(AppState {
@@ -25,7 +28,7 @@ async fn main() -> std::io::Result<()> {
         instance_uuid: id.to_string(),
     });
 
-    println!("starting server with UUID: {}", id);
+    log::info!("starting server with UUID: {}", id);
 
     HttpServer::new(move || {
         App::new()
