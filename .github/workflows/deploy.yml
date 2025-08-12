@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ dev ]
+  workflow_run:
+    workflows: ["CI"]
+    branches: [ dev ]
+    types: 
+      - completed
+
+jobs:
+  deploy-to-staging:
+    if: ${{ github.ref == 'refs/heads/dev' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+    
+    - name: Merge dev to staging
+      run: |
+        git checkout staging
+        git merge dev --no-ff -m "Auto-merge dev to staging"
+        git push origin staging
+    
+    - name: Wait for staging deployment
+      run: sleep 60
+    
+    - name: Run staging tests
+      run: |
+        # Add staging environment tests here
+        echo "Running staging tests..."
+        # curl -f https://your-staging-app.ondigitalocean.app/ || exit 1
+  
+  deploy-to-production:
+    needs: deploy-to-staging
+    if: success()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+    
+    - name: Merge staging to production
+      run: |
+        git checkout production
+        git merge staging --no-ff -m "Auto-merge staging to production"
+        git push origin production

@@ -1,0 +1,37 @@
+name: load-balancer-test-dev
+region: nyc1
+
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/do-ap-internal-lb-testing
+    branch: dev
+    deploy_on_push: true
+  run_command: ./target/release/test0
+  environment_slug: rust
+  instance_count: 2
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  
+  envs:
+  - key: APP_ENV
+    value: development
+    
+  health_check:
+    http_path: /
+    initial_delay_seconds: 30
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+
+alerts:
+- rule: CPU_UTILIZATION
+  value: 80
+  operator: GREATER_THAN
+  window: FIVE_MINUTES
+- rule: MEM_UTILIZATION  
+  value: 80
+  operator: GREATER_THAN
+  window: FIVE_MINUTES

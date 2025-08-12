@@ -1,0 +1,24 @@
+{
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "do-api-key",
+            "description": "DigitalOcean API Key",
+            "password": true
+        }
+    ],
+    "servers": {
+        "digitalocean": {
+            "command": "npx",
+            "args": [
+                "@digitalocean/mcp",
+                "--services",
+                "apps"
+            ],
+            "type": "stdio",
+            "env": {
+                "DIGITALOCEAN_TOKEN": "${input:do-api-key}"
+            }
+        }
+    }
+}
