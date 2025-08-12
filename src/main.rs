@@ -9,12 +9,15 @@ async fn main() -> std::io::Result<()> {
 
     let id = Uuid::new_v4();
 
+    let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
+
     let data = web::Data::new(AppState {
         request_count: Mutex::new(0),
         instance_uuid: id.to_string(),
+        app_env: app_env.clone(),
     });
 
-    log::info!("starting server with UUID: {}", id);
+    log::info!("starting {} server with UUID: {}", app_env, id);
 
     HttpServer::new(move || {
         App::new()
@@ -36,6 +39,7 @@ mod tests {
         let app_state = web::Data::new(AppState {
             request_count: Mutex::new(0),
             instance_uuid: "test-uuid".to_string(),
+            app_env: "test".to_string(),
         });
 
         let app = test::init_service(
@@ -61,6 +65,7 @@ mod tests {
         let app_state = web::Data::new(AppState {
             request_count: Mutex::new(0),
             instance_uuid: "test-uuid".to_string(),
+            app_env: "test".to_string(),
         });
 
         let app = test::init_service(

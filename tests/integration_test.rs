@@ -7,6 +7,7 @@ async fn test_http_endpoint_integration() {
     let app_state = web::Data::new(AppState {
         request_count: Mutex::new(0),
         instance_uuid: "integration-test-uuid".to_string(),
+        app_env: "test".to_string(),
     });
 
     let app = test::init_service(
